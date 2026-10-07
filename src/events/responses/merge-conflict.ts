@@ -92,12 +92,9 @@ async function check(
       Date.parse(lastCommitTime) < Date.parse(c.created_at),
   );
 
-  const labels = await this.issues.listLabelsOnIssue({
-    owner: repoOwner,
-    repo: repoName,
-    issue_number: number,
-  });
-  const isInactive = labels.data.some(
+  // Labels are already included in the pull request response, so use those
+  // instead of fetching them again.
+  const isInactive = pull.data.labels.some(
     (l) => l.name === this.cfg.activity.inactive,
   );
 

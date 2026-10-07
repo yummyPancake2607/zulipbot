@@ -27,13 +27,11 @@ void test("merge-conflict: Posts warning comment on mergeable=false PR", async (
     .get("/repos/zulip/zulipbot/pulls")
     .reply(200, [{ number: 50 }])
     .get("/repos/zulip/zulipbot/pulls/50")
-    .reply(200, { mergeable: false, user: { login: "alice" } })
+    .reply(200, { mergeable: false, user: { login: "alice" }, labels: [] })
     .get("/repos/zulip/zulipbot/issues/50/comments")
     .reply(200, [])
     .get("/repos/zulip/zulipbot/pulls/50/commits")
     .reply(200, [{ commit: { committer: { date: "2026-04-01T00:00:00Z" } } }])
-    .get("/repos/zulip/zulipbot/issues/50/labels")
-    .reply(200, [])
     .post("/repos/zulip/zulipbot/issues/50/comments", {
       body: "warning alice main",
     })
@@ -54,13 +52,15 @@ void test("merge-conflict: Skips warning when inactive label is present", async 
     .get("/repos/zulip/zulipbot/pulls")
     .reply(200, [{ number: 51 }])
     .get("/repos/zulip/zulipbot/pulls/51")
-    .reply(200, { mergeable: false, user: { login: "alice" } })
+    .reply(200, {
+      mergeable: false,
+      user: { login: "alice" },
+      labels: [{ name: "inactive" }],
+    })
     .get("/repos/zulip/zulipbot/issues/51/comments")
     .reply(200, [])
     .get("/repos/zulip/zulipbot/pulls/51/commits")
-    .reply(200, [])
-    .get("/repos/zulip/zulipbot/issues/51/labels")
-    .reply(200, [{ name: "inactive" }]);
+    .reply(200, []);
 
   await mergeConflict.run.call(client, repo);
 
