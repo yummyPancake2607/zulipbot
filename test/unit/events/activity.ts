@@ -8,7 +8,7 @@ void test("activity: Handle multiple and missing issue references", async () => 
   client.cfg.activity.check.repositories = ["zulip/zulip"];
 
   const scope = nock("https://api.github.com")
-    .get("/repos/zulip/zulip/pulls")
+    .get("/repos/zulip/zulip/pulls?per_page=100")
     .reply(200, [
       {
         base: { repo: { name: "zulip", owner: { login: "zulip" } } },
@@ -26,7 +26,7 @@ void test("activity: Handle multiple and missing issue references", async () => 
     .reply(200, { pull_request: false, state: "open" })
     .get("/repos/zulip/zulip/pulls/1/commits")
     .reply(200, [])
-    .get("/issues?filter=all&labels=in%20progress")
+    .get("/issues?filter=all&labels=in%20progress&per_page=100")
     .reply(200, []);
 
   await activity.run.call(client);
@@ -50,9 +50,9 @@ void test("activity: Continues past inactive issue with no assignees", async () 
   };
 
   const scope = nock("https://api.github.com")
-    .get("/repos/zulip/zulip/pulls")
+    .get("/repos/zulip/zulip/pulls?per_page=100")
     .reply(200, [])
-    .get("/issues?filter=all&labels=in%20progress")
+    .get("/issues?filter=all&labels=in%20progress&per_page=100")
     .reply(200, [
       {
         number: 10,
@@ -73,7 +73,7 @@ void test("activity: Continues past inactive issue with no assignees", async () 
       body: "**ERROR:** This active issue has no assignee.",
     })
     .reply(201)
-    .get("/repos/zulip/zulip/issues/11/comments")
+    .get("/repos/zulip/zulip/issues/11/comments?per_page=100")
     .reply(200, [])
     .post("/repos/zulip/zulip/issues/11/comments")
     .reply(201);
@@ -101,9 +101,9 @@ void test("activity: Unassigns and upgrades warning when prior inactive comment 
   const oldDate = new Date(Date.now() - 20 * 86_400_000).toISOString();
 
   const scope = nock("https://api.github.com")
-    .get("/repos/zulip/zulip/pulls")
+    .get("/repos/zulip/zulip/pulls?per_page=100")
     .reply(200, [])
-    .get("/issues?filter=all&labels=in%20progress")
+    .get("/issues?filter=all&labels=in%20progress&per_page=100")
     .reply(200, [
       {
         number: 20,
@@ -117,7 +117,7 @@ void test("activity: Unassigns and upgrades warning when prior inactive comment 
         },
       },
     ])
-    .get("/repos/zulip/zulip/issues/20/comments")
+    .get("/repos/zulip/zulip/issues/20/comments?per_page=100")
     .reply(200, [
       {
         id: 555,

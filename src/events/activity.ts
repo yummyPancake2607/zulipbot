@@ -16,6 +16,7 @@ export const run = async function (this: Client) {
     for await (const response of this.paginate.iterator(this.pulls.list, {
       owner: repoOwner,
       repo: repoName,
+      per_page: 100,
     })) {
       await scrapePulls.call(this, response.data, referenceList);
     }
@@ -107,6 +108,7 @@ async function scrapeInactiveIssues(
   for await (const response of this.paginate.iterator(this.issues.list, {
     filter: "all",
     labels: this.cfg.activity.issues.inProgress ?? undefined,
+    per_page: 100,
   })) {
     for (const issue of response.data) {
       const hasInactiveLabel = issue.labels.some(
