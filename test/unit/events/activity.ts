@@ -15,10 +15,9 @@ void test("activity: Handle multiple and missing issue references", async () => 
         number: 1,
         body: "Fixes #2, fixes #3, fixes #4",
         updated_at: new Date().toISOString(),
+        labels: [],
       },
     ])
-    .get("/repos/zulip/zulip/issues/1/labels")
-    .reply(200, [])
     .get("/repos/zulip/zulip/issues/2")
     .reply(404)
     .get("/repos/zulip/zulip/issues/3")
