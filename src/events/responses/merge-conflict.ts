@@ -59,6 +59,14 @@ async function check(
   // Use a strict false check; unknown merge conflict statuses return null
   if (pull.data.mergeable !== false) return;
 
+  // Labels are already included in the pull request response, so use those
+  // instead of fetching them again.
+  const isInactive = pull.data.labels.some(
+    (l) => l.name === this.cfg.activity.inactive,
+  );
+
+  if (isInactive) return;
+
   const username = pull.data.user.login;
 
   const template = this.templates.get("mergeConflictWarning");
@@ -91,14 +99,6 @@ async function check(
       lastCommitTime === undefined ||
       Date.parse(lastCommitTime) < Date.parse(c.created_at),
   );
-
-  // Labels are already included in the pull request response, so use those
-  // instead of fetching them again.
-  const isInactive = pull.data.labels.some(
-    (l) => l.name === this.cfg.activity.inactive,
-  );
-
-  if (isInactive) return;
 
   if (!hasWarnComment && comment) {
     await this.issues.createComment({

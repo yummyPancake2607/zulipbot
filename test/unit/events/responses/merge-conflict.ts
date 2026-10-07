@@ -56,11 +56,7 @@ void test("merge-conflict: Skips warning when inactive label is present", async 
       mergeable: false,
       user: { login: "alice" },
       labels: [{ name: "inactive" }],
-    })
-    .get("/repos/zulip/zulipbot/issues/51/comments")
-    .reply(200, [])
-    .get("/repos/zulip/zulipbot/pulls/51/commits")
-    .reply(200, []);
+    });
 
   await mergeConflict.run.call(client, repo);
 
